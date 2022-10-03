@@ -6,7 +6,8 @@ require "http/client";
 ##### Functions #####
 ## Parse args ##
 OptionParser.parse do |parser|
-    parser.banner = "Quotes - by NewDawn0"
+    banner = "Quotes - by NewDawn0"
+    parser.banner = "#{banner}\nUsage: quotes [arguments]"
     parser.on "-v", "--version", "Show version" do
         puts banner
         puts "on v1.0.0"
@@ -20,6 +21,11 @@ OptionParser.parse do |parser|
         fetch
     end
     parser.on("-n NAME", "--name NAME", "Gets a quote by the name entered") { |name| fetchName(name.titleize) }
+    parser.invalid_option do |flag|
+        STDERR.puts "Error: #{flag} is not a valid option"
+        STDERR.puts parser
+        exit(1)
+    end
 end
 fetch
 
