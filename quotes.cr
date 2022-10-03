@@ -20,12 +20,16 @@ OptionParser.parse do |parser|
         fetch
     end
 end
+fetch()
+
 ## fn fetch ##
 def fetch
     res = HTTP::Client.get "https://stoicquotesapi.com/v1/api/quotes/random"
-    res = JSON.parse(res.body)
-    quote = res["body"]
-    author = res["author"]
-    puts "#{quote}\t -- #{author}"
-    exit
+    if res.status_code == 200
+        res = JSON.parse(res.body)
+        quote = res["body"]
+        author = res["author"]
+        puts "#{quote}\t -- #{author}"
+        exit
+    end
 end
