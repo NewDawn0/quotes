@@ -19,17 +19,35 @@ OptionParser.parse do |parser|
     parser.on "-r", "--random", "Show random quote" do
         fetch
     end
+    parser.on("-n NAME", "--name NAME", "Gets a quote by the name entered") { |name| fetchName(name.titleize) }
 end
-fetch()
+fetch
 
 ## fn fetch ##
 def fetch
-    res = HTTP::Client.get "https://stoicquotesapi.com/v1/api/quotes/random"
+    baseUrl = "https://stoicquotesapi.com/v1/api/quotes"
+    res = HTTP::Client.get "#{baseUrl}/random"
     if res.status_code == 200
         res = JSON.parse(res.body)
         quote = res["body"]
         author = res["author"]
         puts "#{quote}\t -- #{author}"
         exit
+    end
+end
+## fetch by name ##
+def fetchName(input)
+    baseUrl = "https://stoicquotesapi.com/v1/api/quotes"
+    res = HTTP::Client.get "#{baseUrl}/#{input}"
+    if res.status_code == 200
+        res = JSON.parse(res.body)
+        rand = Random.rand(10)
+        quote = res["data"][rand]["body"]
+        author = res["data"][rand]["author"]
+        puts "#{quote}\t -- #{author}"
+        exit
+    else
+        STDERR.puts "Couldn't get quotes"
+        exit(1)
     end
 end
