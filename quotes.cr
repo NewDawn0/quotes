@@ -18,38 +18,31 @@ OptionParser.parse do |parser|
         exit
     end
     parser.on "-r", "--random", "Show random quote" do
-        fetch
+        fetch("random")
     end
-    parser.on("-n NAME", "--name NAME", "Gets a quote by the name entered") { |name| fetchName(name.titleize) }
+    parser.on("-n NAME", "--name NAME", "Gets a quote by the name entered") { |name| fetch(name.titleize, author=true) }
     parser.invalid_option do |flag|
         STDERR.puts "Error: #{flag} is not a valid option"
         STDERR.puts parser
         exit(1)
     end
 end
-fetch
+fetch("random")
 
 ## fn fetch ##
-def fetch
-    baseUrl = "https://stoicquotesapi.com/v1/api/quotes"
-    res = HTTP::Client.get "#{baseUrl}/random"
-    if res.status_code == 200
-        res = JSON.parse(res.body)
-        quote = res["body"]
-        author = res["author"]
-        puts "#{quote}\t -- #{author}"
-        exit
-    end
-end
-## fetch by name ##
-def fetchName(input)
+def fetch(input, author=false)
     baseUrl = "https://stoicquotesapi.com/v1/api/quotes"
     res = HTTP::Client.get "#{baseUrl}/#{input}"
     if res.status_code == 200
         res = JSON.parse(res.body)
-        rand = Random.rand(10)
-        quote = res["data"][rand]["body"]
-        author = res["data"][rand]["author"]
+        if author == true
+          rand = Random.rand(10)
+          quote = res["data"][rand]["body"]
+          author = res["data"][rand]["author"]
+        else
+          quote = res["body"]
+          author = res["author"]
+        end
         puts "#{quote}\t -- #{author}"
         exit
     else
